@@ -32,3 +32,13 @@ For larger sizes, option 2 is the best.
 
 Since option 2 is also easier to implement than the other options, it is chosen for this project.
 Option 1 would require macros and option 3 the appropriate creation of vectors (one per thread) and passing them as mutable references.
+
+** Parallelization
+
+The concept for parallelization is not fully developed yet.
+But there are some criteria that are clear at this point:
+
+- Concurrency primitives from [[https://en.wikipedia.org/wiki/Communicating_sequential_processes][CSP]] (think channels from go)
+- Each thread computes one line sequentially at a time
+  - Somehow need to configure direction
+  - Need to reset state after every line
