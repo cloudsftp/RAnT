@@ -17,12 +17,11 @@ We hope to achieve performance improvements through compiler optimizations and s
 1. Simple library functions for simulating 1D floating-point R -> R functions
    - Cycles
    - Basins of attraction
-2. Image generation
-3. Interactive image generation (zoom and pan)
+2. Parallelization
+3. Image generation
+4. Interactive image generation (zoom and pan)
 
-
-
-* Design desitions
+* Design decitions
 
 ** History array for cycle detection
 
@@ -34,3 +33,4 @@ found that option 1 is the fastest for small sizes of the history array.
 For larger sizes, option 2 is the best.
 
 Since option 2 is also easier to implement than the other options, it is chosen for this project.
+Option 1 would require macros and option 3 the appropriate creation of vectors (one per thread) and passing them as mutable references.
