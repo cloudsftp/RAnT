@@ -6,3 +6,11 @@ fn main() {
 
     println!("{:?}", find_cycle(f, 0.5, 1_000, 10))
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn foo_test() {
+        assert!(false);
+    }
+}
