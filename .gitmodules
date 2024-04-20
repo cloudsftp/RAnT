@@ -1,0 +1,3 @@
+[submodule "examples/AnT"]
+	path = examples/AnT-src
+	url = git@github.com:cloudsftp/AnT.git
