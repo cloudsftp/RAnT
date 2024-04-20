@@ -1,7 +1,5 @@
 #+title: RAnT
 
-* RAnT
-
 A Rust library for numerical simulation of non-linear systems.
 
 ** Idea
@@ -21,7 +19,7 @@ We hope to achieve performance improvements through compiler optimizations and s
 3. Image generation
 4. Interactive image generation (zoom and pan)
 
-* Design decitions
+* Design decisions
 
 ** History array for cycle detection
 
