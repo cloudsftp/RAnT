@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod test;
+
 #[derive(Debug, PartialEq)]
 pub enum Cycle {
     FixedPoint(f64),
@@ -35,15 +38,17 @@ impl Cycle {
     }
 }
 
-const MAX_ITERATIONS: usize = 1_000;
-const MAX_CYCLE_LENGTH: usize = 10;
-
-pub fn find_cycle(f: impl Fn(f64) -> f64, initial_state: f64) -> Cycle {
-    let mut history: [f64; MAX_CYCLE_LENGTH] = [f64::NEG_INFINITY; MAX_CYCLE_LENGTH];
+pub fn find_cycle(
+    f: impl Fn(f64) -> f64,
+    initial_state: f64,
+    max_iterations: usize,
+    max_cycle_length: usize,
+) -> Cycle {
+    let mut history = vec![f64::NEG_INFINITY; max_cycle_length];
     let mut x = initial_state;
 
-    for i in 0..MAX_ITERATIONS {
-        let history_index = i % MAX_CYCLE_LENGTH;
+    for i in 0..max_iterations {
+        let history_index = i % max_cycle_length;
 
         let first_encounter = history.iter().position(|h| *h == x);
         if let Some(first_encounter) = first_encounter {
@@ -55,73 +60,4 @@ pub fn find_cycle(f: impl Fn(f64) -> f64, initial_state: f64) -> Cycle {
     }
 
     Cycle::Divergence
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    struct CycleFromHistoryTestCase<'a> {
-        history: &'a [f64],
-        first_encounter: usize,
-        current_position: usize,
-        expected: Cycle,
-    }
-
-    #[test]
-    fn cycle_from_history() {
-        let test_cases = [
-            CycleFromHistoryTestCase {
-                history: &[0., f64::NEG_INFINITY],
-                first_encounter: 0,
-                current_position: 1,
-                expected: Cycle::FixedPoint(0.),
-            },
-            CycleFromHistoryTestCase {
-                history: &[0., 1., f64::NEG_INFINITY],
-                first_encounter: 0,
-                current_position: 2,
-                expected: Cycle::Cycle(vec![0., 1.]),
-            },
-            CycleFromHistoryTestCase {
-                history: &[0., 1., 2., f64::NEG_INFINITY],
-                first_encounter: 0,
-                current_position: 3,
-                expected: Cycle::Cycle(vec![0., 1., 2.]),
-            },
-            CycleFromHistoryTestCase {
-                history: &[-1., 0., 1., 2., f64::NEG_INFINITY],
-                first_encounter: 1,
-                current_position: 4,
-                expected: Cycle::Cycle(vec![0., 1., 2.]),
-            },
-            CycleFromHistoryTestCase {
-                history: &[-2., -1., 0., 1., 2., 3.],
-                first_encounter: 2,
-                current_position: 0,
-                expected: Cycle::Cycle(vec![0., 1., 2., 3.]),
-            },
-            CycleFromHistoryTestCase {
-                history: &[-2., -1., 0., 1., 2., 3.],
-                first_encounter: 2,
-                current_position: 1,
-                expected: Cycle::Cycle(vec![0., 1., 2., 3., -2.]),
-            },
-            CycleFromHistoryTestCase {
-                history: &[-2., -1., 0., 1., 2., 3.],
-                first_encounter: 2,
-                current_position: 2,
-                expected: Cycle::Cycle(vec![0., 1., 2., 3., -2., -1.]),
-            },
-        ];
-
-        for test_case in test_cases {
-            let cycle = Cycle::from_history(
-                test_case.history,
-                test_case.first_encounter,
-                test_case.current_position,
-            );
-            assert_eq!(cycle, test_case.expected);
-        }
-    }
 }
