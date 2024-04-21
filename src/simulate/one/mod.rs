@@ -8,7 +8,7 @@ pub struct SimulationOptions {
 
 #[derive(Debug)]
 pub struct SimulationResult {
-    cycle: Cycle,
+    pub cycle: Cycle,
 }
 
 #[derive(Debug, PartialEq)]
@@ -30,19 +30,22 @@ impl Cycle {
             return Cycle::FixedPoint(history[first_encounter]);
         }
 
-        let mut cycle = Vec::with_capacity(cycle_length);
-        if first_encounter < current_position {
-            for i in first_encounter..current_position {
-                cycle.push(history[i]);
-            }
+        // TODO: test performance against implementation with for loops and pushing to vec
+        let cycle = if first_encounter < current_position {
+            history
+                .iter()
+                .take(current_position)
+                .skip(first_encounter)
+                .copied()
+                .collect()
         } else {
-            for i in first_encounter..history.len() {
-                cycle.push(history[i]);
-            }
-            for i in 0..current_position {
-                cycle.push(history[i]);
-            }
-        }
+            history
+                .iter()
+                .skip(first_encounter)
+                .chain(history.iter().take(current_position))
+                .copied()
+                .collect()
+        };
 
         Cycle::Cycle(cycle)
     }
