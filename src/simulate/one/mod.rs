@@ -4,6 +4,7 @@ mod test;
 pub struct SimulationOptions {
     pub iterations: usize,
     pub max_period: usize,
+    pub delta: f64,
 }
 
 #[derive(Debug)]
@@ -53,6 +54,7 @@ impl Cycle {
 
 pub fn simulate_function<P>(
     f: impl Fn(f64, &P) -> f64,
+    d: impl Fn(&f64, &f64) -> f64,
     initial_state: f64,
     parameters: P,
     simulation_options: &SimulationOptions,
@@ -63,7 +65,9 @@ pub fn simulate_function<P>(
     for i in 0..simulation_options.iterations {
         let history_index = i % simulation_options.max_period;
 
-        let first_encounter = history.iter().position(|h| *h == x);
+        let first_encounter = history
+            .iter()
+            .position(|h| d(h, &x) < simulation_options.delta);
         if let Some(first_encounter) = first_encounter {
             return SimulationResult {
                 cycle: Cycle::from_history(&history, first_encounter, history_index),
