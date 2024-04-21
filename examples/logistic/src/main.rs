@@ -1,16 +1,46 @@
-use rant::simulate::find_cycle;
+use rant::{
+    scan::one::{scan_1function, ScanOptions},
+    simulate::one::SimulationOptions,
+};
+
+struct Parameters {
+    a: f64,
+}
+
+fn logistic(x: f64, params: &Parameters) -> f64 {
+    params.a * x * (1. - x)
+}
+
+const START: f64 = 3.;
+const STOP: f64 = 4.;
+const RESOLUTION: f64 = 100.;
+fn gen_parameters(x: usize, len: usize) -> Parameters {
+    Parameters {
+        a: START + (x as f64 / len as f64) * (STOP - START) / RESOLUTION,
+    }
+}
 
 fn main() {
-    let a = 3.1;
-    let f = |x: f64| a * x * (1f64 - x);
+    let scan_options = ScanOptions {
+        num_points: RESOLUTION as usize,
+        initial_state: 0.5,
+    };
 
-    println!("{:?}", find_cycle(f, 0.5, 1_000, 10))
+    let simulation_options = SimulationOptions {
+        iterations: 20_000,
+        max_period: 128,
+    };
+
+    let results = scan_1function(logistic, gen_parameters, scan_options, simulation_options);
+
+    println!("{:?}", results)
 }
 
 #[cfg(test)]
 mod test {
     #[test]
-    fn foo_test() {
-        assert!(false);
+    fn period_test() {
+        let max_period = 128;
+        let iterations = 20_000;
     }
 }
