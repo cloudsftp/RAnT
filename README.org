@@ -10,14 +10,18 @@ The tool [[https://github.com/cloudsftp/AnT][AnT]], that I was using extensively
 In contrast to the tool mentioned above, with this library one writes the function of interest in rust code and passes it to the appropriate library functions for simulation and analysis.
 We hope to achieve performance improvements through compiler optimizations and static linking.
 
-** Roadmap
+** Roadmap [2/7]
 
-1. Simple library functions for simulating 1D floating-point R -> R functions
-   - Cycles
-   - Basins of attraction
-2. Parallelization
-3. Image generation
-4. Interactive image generation (zoom and pan)
+1. [X] Simulate 1D floating-point R -> R functions
+   - Cycles and Periods
+2. [X] Scanning parameters 1D
+3. [ ] Test performance of generic S -> S functions
+4. [ ] Parallelization
+5. [ ] More scanning options
+   - [ ] initial states
+   - [ ] multi dimensional for both initial states and parameters
+6. [ ] Image generation
+7. [ ] Interactive image generation (zoom and pan)
 
 * Design decisions
 
@@ -41,4 +45,4 @@ But there are some criteria that are clear at this point:
 - Concurrency primitives from [[https://en.wikipedia.org/wiki/Communicating_sequential_processes][CSP]] (think channels from go)
 - Each thread computes one line sequentially at a time
   - Somehow need to configure direction
-  - Need to reset state after every line
+  - Need to reset initial state after every line
