@@ -1,10 +1,10 @@
 use super::*;
 
-struct CycleFromHistoryTestCase<'a> {
+struct CycleFromHistoryTestCase<'a, S> {
     history: &'a [f64],
     first_encounter: usize,
     current_position: usize,
-    expected: Cycle,
+    expected: Cycle<S>,
 }
 
 #[test]

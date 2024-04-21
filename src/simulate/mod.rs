@@ -1,4 +1,5 @@
-pub mod one;
+#[cfg(test)]
+mod test;
 
 pub struct SimulationOptions {
     pub iterations: usize,
