@@ -10,18 +10,19 @@ The tool [[https://github.com/cloudsftp/AnT][AnT]], that I was using extensively
 In contrast to the tool mentioned above, with this library one writes the function of interest in rust code and passes it to the appropriate library functions for simulation and analysis.
 We hope to achieve performance improvements through compiler optimizations and static linking.
 
-** Roadmap [2/7]
+** Roadmap [3/8]
 
 1. [X] Simulate 1D floating-point R -> R functions
    - Cycles and Periods
 2. [X] Scanning parameters 1D
-3. [ ] Test performance of generic S -> S functions
-4. [ ] Parallelization
-5. [ ] More scanning options
+3. [X] Test performance of generic S -> S functions
+4. [ ] Test logistic period results
+5. [ ] Parallelization
+6. [ ] More scanning options
    - [ ] initial states
    - [ ] multi dimensional for both initial states and parameters
-6. [ ] Image generation
-7. [ ] Interactive image generation (zoom and pan)
+7. [ ] Image generation
+8. [ ] Interactive image generation (zoom and pan)
 
 * Design decisions
 
