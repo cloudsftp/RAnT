@@ -23,35 +23,13 @@ impl<S> Cycle<S>
 where
     S: Copy,
 {
-    fn from_history(history: &[S], first_encounter: usize, current_position: usize) -> Self {
-        let cycle_length = if first_encounter < current_position {
-            current_position - first_encounter - 1
-        } else {
-            current_position + history.len() - first_encounter
-        };
+    fn from_history(history: &[S], last_encounter: usize) -> Self {
+        let cycle_length = history.len() - last_encounter - 1;
 
-        if cycle_length == 0 {
-            return Cycle::FixedPoint(history[first_encounter]);
+        match cycle_length {
+            0 => Cycle::FixedPoint(history[last_encounter]),
+            _ => Cycle::Cycle(history.iter().skip(last_encounter).copied().collect()),
         }
-
-        // TODO: test performance against implementation with for loops and pushing to vec
-        let cycle = if first_encounter < current_position {
-            history
-                .iter()
-                .take(current_position)
-                .skip(first_encounter)
-                .copied()
-                .collect()
-        } else {
-            history
-                .iter()
-                .skip(first_encounter)
-                .chain(history.iter().take(current_position))
-                .copied()
-                .collect()
-        };
-
-        Cycle::Cycle(cycle)
     }
 }
 
@@ -65,26 +43,33 @@ pub fn simulate_function<S, P>(
 where
     S: Default + Copy,
 {
-    let mut history = vec![S::default(); simulation_options.max_period];
+    let history_length = simulation_options.max_period;
+    let mut history = vec![S::default(); history_length];
     let mut x = initial_state;
 
-    for i in 0..simulation_options.iterations {
-        let history_index = i % simulation_options.max_period;
-
-        let first_encounter = history
-            .iter()
-            .position(|h| d(h, &x) < simulation_options.delta);
-        if let Some(first_encounter) = first_encounter {
-            return SimulationResult {
-                cycle: Cycle::from_history(&history, first_encounter, history_index),
-            };
-        }
-
-        history[history_index] = x;
+    for _ in 0..simulation_options.iterations - history_length {
         x = f(x, parameters);
     }
 
-    SimulationResult {
-        cycle: Cycle::Divergence, // TODO: rotate history and return it also
+    for i in 0..history_length {
+        // TODO: earlier checks for cycles
+        history[i] = x;
+        x = f(x, parameters);
+    }
+
+    let last_encounter = history
+        .iter()
+        .rev()
+        .take(simulation_options.max_period)
+        .position(|h| d(h, &x) < simulation_options.delta)
+        .map(|pos| history_length - pos - 1);
+
+    match last_encounter {
+        Some(last_encounter) => SimulationResult {
+            cycle: Cycle::from_history(&history, last_encounter),
+        },
+        None => SimulationResult {
+            cycle: Cycle::Divergence, // TODO: rotate history and return it also
+        },
     }
 }
