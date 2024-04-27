@@ -27,23 +27,11 @@ We hope to achieve performance improvements through compiler optimizations and s
 
 * Design decisions
 
-** History array for cycle detection
-
-A benchmarking analysis of the three alternatives
-1. stack
-2. heap
-3. heap whith reuse of vector
-found that option 1 is the fastest for small sizes of the history array.
-For larger sizes, option 2 is the best.
-
-Since option 2 is also easier to implement than the other options, it is chosen for this project.
-Option 1 would require macros and option 3 the appropriate creation of vectors (one per thread) and passing them as mutable references.
-
 ** Implementation of extra library functions for 1D functions
 
 A benchmarking of a generic implementation and a static implementation for 1D functions found no significant difference (58ms vs. 60ms).
 Suprisingly, the generic implementation was a little faster.
-Therefore, we will only keep the generic implementation for better maintenance.
+Therefore, we will only keep the generic implementation for improved maintenance.
 
 ** Parallelization
 
@@ -54,3 +42,15 @@ But there are some criteria that are clear at this point:
 - Each thread computes one line sequentially at a time
   - Somehow need to configure direction
   - Need to reset initial state after every line
+
+** History array for cycle detection (not used anymore)
+
+A benchmarking analysis of the three alternatives
+1. stack
+2. heap
+3. heap whith reuse of vector
+found that option 1 is the fastest for small sizes of the history array.
+For larger sizes, option 2 is the best.
+
+Since option 2 is also easier to implement than the other options, it is chosen for this project.
+Option 1 would require macros and option 3 the appropriate creation of vectors (one per thread) and passing them as mutable references.
