@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use rant::{
     scan::one::{scan_function, ScanOptions},
     simulate::SimulationOptions,
@@ -8,12 +10,20 @@ struct Parameters {
     a: f64,
 }
 
+fn compare_parameters(a: &Parameters, b: &Parameters) -> Ordering {
+    a.a.total_cmp(&b.a)
+}
+
 fn logistic(x: f64, params: &Parameters) -> f64 {
     params.a * x * (1. - x)
 }
 
 fn distance(a: &f64, b: &f64) -> f64 {
     (a - b).abs()
+}
+
+fn compare_states(a: &f64, b: &f64) -> Ordering {
+    a.total_cmp(b)
 }
 
 const START: f64 = 3.;
@@ -51,7 +61,7 @@ fn main() {
 #[cfg(test)]
 mod test {
     use anyhow::anyhow;
-    use rant::util::tna::read_tna_periods_file;
+    use rant::util::tna::{assert_equals_tna_periods, read_tna_periods_file, ComparisonOptions};
 
     use super::*;
 
@@ -69,12 +79,40 @@ mod test {
     fn period_test() {
         let max_period = 128;
         let iterations = 20_000;
+        let delta = 1e-9;
 
-        let periods = read_tna_periods_file(
+        let ant_result = read_tna_periods_file(
             "ant/test_data/period.tna",
             unproject_initial_state_and_parameters,
+        )
+        .expect("problem while reading ant/test_data/period.tna");
+
+        let scan_options = ScanOptions {
+            num_points: RESOLUTION as usize,
+            initial_state: 0.5,
+        };
+
+        let simulation_options = SimulationOptions {
+            iterations,
+            max_period,
+            delta,
+        };
+
+        let rant_result = scan_function(
+            logistic,
+            distance,
+            gen_parameters,
+            scan_options,
+            simulation_options,
         );
-        dbg!(periods);
-        assert!(false)
+
+        let comparison_options = ComparisonOptions { delta };
+        assert_equals_tna_periods(
+            rant_result,
+            ant_result,
+            compare_states,
+            compare_parameters,
+            comparison_options,
+        );
     }
 }

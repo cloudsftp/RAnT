@@ -11,7 +11,7 @@ pub fn scan_function<S, P>(
     p: impl Fn(usize, usize) -> P,
     scan_options: ScanOptions<S>,
     simulation_options: SimulationOptions,
-) -> Vec<SimulationResult<S>>
+) -> Vec<(S, P, SimulationResult<S>)>
 where
     S: Default + Copy,
 {
@@ -23,11 +23,11 @@ where
             &f,
             &d,
             scan_options.initial_state,
-            parameters,
+            &parameters,
             &simulation_options,
         );
 
-        results.push(result)
+        results.push((scan_options.initial_state, parameters, result));
     }
 
     results

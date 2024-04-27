@@ -59,7 +59,7 @@ pub fn simulate_function<S, P>(
     f: impl Fn(S, &P) -> S,
     d: impl Fn(&S, &S) -> f64,
     initial_state: S,
-    parameters: P,
+    parameters: &P,
     simulation_options: &SimulationOptions,
 ) -> SimulationResult<S>
 where
@@ -81,7 +81,7 @@ where
         }
 
         history[history_index] = x;
-        x = f(x, &parameters);
+        x = f(x, parameters);
     }
 
     SimulationResult {
