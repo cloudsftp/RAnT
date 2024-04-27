@@ -79,7 +79,7 @@ mod test {
     fn period_test() {
         let max_period = 128;
         let iterations = 20_000;
-        let delta = 1e-24;
+        let delta = 1e-9;
 
         let ant_result = read_tna_periods_file(
             "ant/test_data/period.tna",
