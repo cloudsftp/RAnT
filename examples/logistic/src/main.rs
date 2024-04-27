@@ -28,16 +28,16 @@ fn compare_states(a: &f64, b: &f64) -> Ordering {
 
 const START: f64 = 3.;
 const STOP: f64 = 4.;
-const RESOLUTION: f64 = 100.;
-fn gen_parameters(x: usize, len: usize) -> Parameters {
+const RESOLUTION: usize = 100;
+fn gen_parameters(x: usize, resolution: usize) -> Parameters {
     Parameters {
-        a: START + (x as f64 / len as f64) * (STOP - START) / RESOLUTION,
+        a: START + (x as f64 / resolution as f64) * (STOP - START),
     }
 }
 
 fn main() {
     let scan_options = ScanOptions {
-        num_points: RESOLUTION as usize,
+        resolution: RESOLUTION,
         initial_state: 0.5,
     };
 
@@ -61,7 +61,7 @@ fn main() {
 #[cfg(test)]
 mod test {
     use anyhow::anyhow;
-    use rant::util::tna::{assert_equals_tna_periods, read_tna_periods_file, ComparisonOptions};
+    use rant::util::tna::{assert_equals_tna_periods, read_tna_periods_file};
 
     use super::*;
 
@@ -79,7 +79,7 @@ mod test {
     fn period_test() {
         let max_period = 128;
         let iterations = 20_000;
-        let delta = 1e-9;
+        let delta = 1e-24;
 
         let ant_result = read_tna_periods_file(
             "ant/test_data/period.tna",
@@ -88,7 +88,7 @@ mod test {
         .expect("problem while reading ant/test_data/period.tna");
 
         let scan_options = ScanOptions {
-            num_points: RESOLUTION as usize,
+            resolution: RESOLUTION,
             initial_state: 0.5,
         };
 
@@ -106,13 +106,6 @@ mod test {
             simulation_options,
         );
 
-        let comparison_options = ComparisonOptions { delta };
-        assert_equals_tna_periods(
-            rant_result,
-            ant_result,
-            compare_states,
-            compare_parameters,
-            comparison_options,
-        );
+        assert_equals_tna_periods(rant_result, ant_result, compare_states, compare_parameters);
     }
 }

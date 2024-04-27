@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, collections::HashMap, fmt::Debug, fs::read_to_string};
+use std::{cmp::Ordering, fmt::Debug, fs::read_to_string};
 
 use thiserror::Error;
 
@@ -41,16 +41,11 @@ pub fn read_tna_periods_file<S, P>(
         .collect::<anyhow::Result<Vec<_>>>()
 }
 
-pub struct ComparisonOptions {
-    pub delta: f64,
-}
-
 pub fn assert_equals_tna_periods<S, P>(
     mut rant_result: Vec<(S, P, SimulationResult<S>)>,
     mut ant_result: Vec<(S, P, usize)>,
     compare_states: impl Fn(&S, &S) -> Ordering,
     compare_parameters: impl Fn(&P, &P) -> Ordering,
-    comparison_options: ComparisonOptions,
 ) where
     S: Debug,
     P: Debug,
@@ -66,17 +61,44 @@ pub fn assert_equals_tna_periods<S, P>(
     rant_result.sort_by(|a, b| sort_by_state_and_parameters((&a.0, &a.1), (&b.0, &b.1)));
     ant_result.sort_by(|a, b| sort_by_state_and_parameters((&a.0, &a.1), (&b.0, &b.1)));
 
+    let mut differences = vec![];
+
     for ((_, rant_parameters, rant_result), (_, ant_parameters, ant_result)) in
         rant_result.into_iter().zip(ant_result)
     {
         match rant_result.cycle {
-            crate::simulate::Cycle::FixedPoint(p) => assert_eq!(ant_result, 1),
-            crate::simulate::Cycle::Cycle(c) => assert_eq!(ant_result, c.len()),
-            crate::simulate::Cycle::Divergence => assert_eq!(
-                ant_result, 0,
-                "RAnT diverges for parameters {:?}, AnT does not (parameters: {:?})",
-                rant_parameters, ant_parameters
-            ),
+            crate::simulate::Cycle::FixedPoint(p) => {
+                if ant_result != 1 {
+                    differences.push(format!(
+                        "RAnT found fixed point {:?} for parameters {:?}, AnT got cycle of length {} (parameters: {:?})",
+                        p, rant_parameters, ant_result, ant_parameters,
+                    ))
+                }
+            }
+
+            crate::simulate::Cycle::Cycle(c) => {
+                if ant_result != c.len() {
+                    differences.push(format!(
+                        "RAnT has cycle of length {} for parameters {:?}, AnT got {} (parameters: {:?}) - rant cycle: {:?}",
+                        c.len(), rant_parameters, ant_result, ant_parameters, c,
+                    ))
+                }
+            }
+            crate::simulate::Cycle::Divergence => {
+                if ant_result != 0 {
+                    differences.push(format!(
+                        "RAnT found divergence for parameters {:?}, AnT got cycle of length {} (parameters: {:?})",
+                        rant_parameters, ant_result, ant_parameters,
+                    ))
+                }
+            }
         }
+    }
+
+    if differences.len() != 0 {
+        for difference in &differences {
+            println!("{}", difference)
+        }
+        panic!("too many differences: {}", differences.len());
     }
 }

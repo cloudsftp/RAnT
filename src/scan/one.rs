@@ -1,7 +1,7 @@
 use crate::simulate::{simulate_function, SimulationOptions, SimulationResult};
 
 pub struct ScanOptions<S> {
-    pub num_points: usize,
+    pub resolution: usize,
     pub initial_state: S,
 }
 
@@ -15,10 +15,11 @@ pub fn scan_function<S, P>(
 where
     S: Default + Copy,
 {
-    let mut results = Vec::with_capacity(scan_options.num_points);
+    let num_points = scan_options.resolution + 1;
+    let mut results = Vec::with_capacity(num_points);
 
-    for i in 0..scan_options.num_points {
-        let parameters = p(i, scan_options.num_points);
+    for i in 0..num_points {
+        let parameters = p(i, scan_options.resolution);
         let result = simulate_function(
             &f,
             &d,
