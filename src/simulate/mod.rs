@@ -51,9 +51,9 @@ where
         x = f(x, parameters);
     }
 
-    for i in 0..history_length {
+    for item in history.iter_mut() {
         // TODO: earlier checks for cycles
-        history[i] = x;
+        *item = x;
         x = f(x, parameters);
     }
 

@@ -95,7 +95,7 @@ pub fn assert_equals_tna_periods<S, P>(
         }
     }
 
-    if differences.len() != 0 {
+    if !differences.is_empty() {
         for difference in &differences {
             println!("{}", difference)
         }
