@@ -7,8 +7,8 @@ pub struct ScanOptions<S> {
 
 pub fn scan_function<S, P>(
     f: impl Fn(S, &P) -> S,
-    d: impl Fn(&S, &S) -> f64,
-    p: impl Fn(usize, usize) -> P,
+    dist: impl Fn(&S, &S) -> f64,
+    param_gen: impl Fn(usize, usize) -> P,
     scan_options: ScanOptions<S>,
     simulation_options: SimulationOptions,
 ) -> Vec<(S, P, SimulationResult<S>)>
@@ -19,10 +19,10 @@ where
     let mut results = Vec::with_capacity(num_points);
 
     for i in 0..num_points {
-        let parameters = p(i, scan_options.resolution);
+        let parameters = param_gen(i, scan_options.resolution);
         let result = simulate_function(
             &f,
-            &d,
+            &dist,
             scan_options.initial_state,
             &parameters,
             &simulation_options,

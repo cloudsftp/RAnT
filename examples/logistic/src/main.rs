@@ -4,7 +4,7 @@ mod test;
 use std::cmp::Ordering;
 
 use rant::{
-    scan::one::{scan_function, ScanOptions},
+    scan::{scan_function, ScanOptions},
     simulate::SimulationOptions,
 };
 
@@ -32,16 +32,19 @@ fn compare_states(a: &f64, b: &f64) -> Ordering {
 const START: f64 = 3.;
 const STOP: f64 = 4.;
 const RESOLUTION: usize = 100;
-fn gen_parameters(x: usize, resolution: usize) -> Parameters {
-    Parameters {
-        a: START + (x as f64 / resolution as f64) * (STOP - START),
-    }
+fn param_gen(scan_point: &[(usize, usize)]) -> (f64, Parameters) {
+    let (x, resolution) = *scan_point.first().expect("one dimensional scan");
+    (
+        0.5,
+        Parameters {
+            a: START + (x as f64 / resolution as f64) * (STOP - START),
+        },
+    )
 }
 
 fn main() {
     let scan_options = ScanOptions {
-        resolution: RESOLUTION,
-        initial_state: 0.5,
+        resolutions: vec![RESOLUTION],
     };
 
     let simulation_options = SimulationOptions {
@@ -53,7 +56,7 @@ fn main() {
     let results = scan_function(
         logistic,
         distance,
-        gen_parameters,
+        param_gen,
         scan_options,
         simulation_options,
     );

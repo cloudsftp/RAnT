@@ -24,8 +24,7 @@ fn period_test() {
     .expect("problem while reading ant/test_data/period.tna");
 
     let scan_options = ScanOptions {
-        resolution: RESOLUTION,
-        initial_state: 0.5,
+        resolutions: vec![RESOLUTION],
     };
 
     let simulation_options = SimulationOptions {
@@ -37,7 +36,7 @@ fn period_test() {
     let rant_result = scan_function(
         logistic,
         distance,
-        gen_parameters,
+        param_gen,
         scan_options,
         simulation_options,
     );
