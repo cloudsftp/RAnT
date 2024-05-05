@@ -19,8 +19,7 @@ pub fn write_results<S, P>(
 
     let lines = results
         .iter()
-        .map(|(s, p, res)| projection(s, p, res))
-        .flatten();
+        .filter_map(|(s, p, res)| projection(s, p, res));
     for line in lines {
         output_file.write_all(line.as_bytes())?;
         output_file.write_all("\n".as_bytes())?;
