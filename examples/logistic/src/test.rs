@@ -1,6 +1,11 @@
 use anyhow::anyhow;
 use rant::util::tna::{assert_equals_tna_periods, read_tna_periods_file};
 
+use rant::{
+    scan::{scan_function, ScanOptions},
+    simulate::SimulationOptions,
+};
+
 use super::*;
 
 fn unproject_initial_state_and_parameters(values: Vec<f64>) -> anyhow::Result<(f64, Parameters)> {

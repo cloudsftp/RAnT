@@ -1,12 +1,13 @@
 #[cfg(test)]
 mod test;
 
-use std::cmp::Ordering;
-
 use rant::{
+    output::text::write_results,
     scan::{scan_function, ScanOptions},
-    simulate::SimulationOptions,
+    simulate::{Cycle, SimulationOptions, SimulationResult},
 };
+
+use std::cmp::Ordering;
 
 #[derive(Debug)]
 struct Parameters {
@@ -42,18 +43,36 @@ fn param_gen(scan_point: &[(usize, usize)]) -> (f64, Parameters) {
     )
 }
 
+fn project_results(
+    _: &f64,
+    parameters: &Parameters,
+    result: &SimulationResult<f64>,
+) -> Option<String> {
+    let period = match &result.cycle {
+        Cycle::FixedPoint(_) => 1,
+        Cycle::Cycle(cycle) => cycle.len(),
+        Cycle::Divergence => 0,
+    };
+
+    Some(format!("{:} {}", parameters.a, period))
+}
+
 fn main() {
+    let max_period = 128;
+    let iterations = 20_000;
+    let delta = 1e-9;
+
     let scan_options = ScanOptions {
         resolutions: vec![RESOLUTION],
     };
 
     let simulation_options = SimulationOptions {
-        iterations: 20_000,
-        max_period: 128,
-        delta: 1e-9,
+        iterations,
+        max_period,
+        delta,
     };
 
-    let results = scan_function(
+    let result = scan_function(
         logistic,
         distance,
         param_gen,
@@ -61,5 +80,6 @@ fn main() {
         simulation_options,
     );
 
-    println!("{:?}", results)
+    write_results(result, project_results, "period.tnar")
+        .expect("something went wrong while writing");
 }
