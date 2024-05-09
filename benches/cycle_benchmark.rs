@@ -1,7 +1,6 @@
 use criterion::{criterion_group, criterion_main, Criterion};
 use rant::{
-    scan::one::{scan_1function, scan_function, ScanOptions, ScanOptions1},
-    simulate::one::SimulationOptions as SimulationOptions1,
+    scan::{scan_function, ScanOptions},
     simulate::SimulationOptions,
 };
 
@@ -18,13 +17,16 @@ fn distance(a: &f64, b: &f64) -> f64 {
 }
 
 const START: f64 = 3.;
-const END: f64 = 4.;
-const RESOLUTION: usize = 1_000;
-
-fn parameter_generator(i: usize, len: usize) -> Parameters {
-    Parameters {
-        a: START + (i as f64 / len as f64) * (END - START) / RESOLUTION as f64,
-    }
+const STOP: f64 = 4.;
+const RESOLUTION: usize = 100;
+fn param_gen(scan_point: &[(usize, usize)]) -> (f64, Parameters) {
+    let (x, resolution) = *scan_point.first().expect("one dimensional scan");
+    (
+        0.5,
+        Parameters {
+            a: START + (x as f64 / resolution as f64) * (STOP - START),
+        },
+    )
 }
 
 const ITERATIONS: usize = 1000;
@@ -34,11 +36,10 @@ const DELTA: f64 = 1e-9;
 pub fn cycles_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("cycles");
 
-    group.bench_function("cycle scan of logistic function - generic", |b| {
+    group.bench_function("cycle scan of logistic function", |b| {
         b.iter(|| {
             let scan_options = ScanOptions {
-                num_points: RESOLUTION,
-                initial_state: 0.5,
+                resolutions: vec![RESOLUTION],
             };
 
             let simulation_options = SimulationOptions {
@@ -50,30 +51,7 @@ pub fn cycles_benchmark(c: &mut Criterion) {
             let _ = scan_function(
                 logistic,
                 distance,
-                parameter_generator,
-                scan_options,
-                simulation_options,
-            );
-        })
-    });
-
-    group.bench_function("cycle scan of logistic function - non-generic", |b| {
-        b.iter(|| {
-            let scan_options = ScanOptions1 {
-                num_points: RESOLUTION,
-                initial_state: 0.5,
-            };
-
-            let simulation_options = SimulationOptions1 {
-                iterations: ITERATIONS,
-                max_period: MAX_PERIOD,
-                delta: DELTA,
-            };
-
-            let _ = scan_1function(
-                logistic,
-                distance,
-                parameter_generator,
+                param_gen,
                 scan_options,
                 simulation_options,
             );
