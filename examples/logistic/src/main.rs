@@ -31,15 +31,10 @@ fn compare_states(a: &f64, b: &f64) -> Ordering {
 }
 
 const START: f64 = 3.;
-const STOP: f64 = 4.;
+const END: f64 = 4.;
 const RESOLUTION: usize = 100;
-fn compute_parameters((x, resolution): &(usize, usize)) -> (f64, Parameters) {
-    (
-        0.5,
-        Parameters {
-            a: START + (*x as f64 / *resolution as f64) * (STOP - START),
-        },
-    )
+fn construct_parameters(a: f64) -> (f64, Parameters) {
+    (0.5, Parameters { a })
 }
 
 fn project_results(

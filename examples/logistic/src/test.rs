@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use rant::scan::adapters::ParameterAdapter1DEven;
 use rant::simulate::simulate_function;
 use rant::util::tna::{assert_equals_tna_periods, read_tna_periods_file};
 
@@ -48,7 +49,16 @@ fn period_test() {
     let generator = VectorGenrator1D {
         resolution: RESOLUTION,
     };
-    let rant_result = scan(generator, compute_parameters, simulate);
+
+    let start = 3.;
+    let end = 4.;
+
+    let parameter_adapter = ParameterAdapter1DEven {
+        start,
+        end,
+        construct_initial_state_and_parameters: construct_parameters,
+    };
+    let rant_result = scan(generator, parameter_adapter, simulate);
 
     assert_equals_tna_periods(rant_result, ant_result, compare_states, compare_parameters);
 }
