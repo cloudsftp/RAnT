@@ -1,8 +1,10 @@
 use anyhow::anyhow;
+use rant::scan::generators::ScanOptions;
+use rant::simulate::simulate_function;
 use rant::util::tna::{assert_equals_tna_periods, read_tna_periods_file};
 
 use rant::{
-    scan::{scan_function, ScanOptions},
+    scan::{generators::VectorGenrator1D, scan},
     simulate::SimulationOptions,
 };
 
@@ -16,21 +18,10 @@ fn unproject_initial_state_and_parameters(values: Vec<f64>) -> anyhow::Result<(f
     }
 }
 
-#[test]
-fn period_test() {
+fn simulate(initial_state: &f64, parameters: &Parameters) {
     let max_period = 128;
     let iterations = 20_000;
     let delta = 1e-9;
-
-    let ant_result = read_tna_periods_file(
-        "ant/test_data/period.tna",
-        unproject_initial_state_and_parameters,
-    )
-    .expect("problem while reading ant/test_data/period.tna");
-
-    let scan_options = ScanOptions {
-        resolutions: vec![RESOLUTION],
-    };
 
     let simulation_options = SimulationOptions {
         iterations,
@@ -38,13 +29,27 @@ fn period_test() {
         delta,
     };
 
-    let rant_result = scan_function(
-        logistic,
-        distance,
-        param_gen,
-        scan_options,
-        simulation_options,
+    simulate_function(
+        &logistic,
+        &distance,
+        *initial_state,
+        parameters,
+        &simulation_options,
     );
+}
+
+#[test]
+fn period_test() {
+    let ant_result = read_tna_periods_file(
+        "ant/test_data/period.tna",
+        unproject_initial_state_and_parameters,
+    )
+    .expect("problem while reading ant/test_data/period.tna");
+
+    let generator = VectorGenrator1D {
+        resolution: RESOLUTION,
+    };
+    let rant_result = scan(generator, compute_parameters, simulate);
 
     assert_equals_tna_periods(rant_result, ant_result, compare_states, compare_parameters);
 }

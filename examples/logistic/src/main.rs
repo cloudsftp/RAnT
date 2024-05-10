@@ -3,7 +3,7 @@ mod test;
 
 use rant::{
     output::text::write_results,
-    scan::{scan_function, ScanOptions},
+    scan::scan,
     simulate::{Cycle, SimulationOptions, SimulationResult},
 };
 
@@ -33,12 +33,11 @@ fn compare_states(a: &f64, b: &f64) -> Ordering {
 const START: f64 = 3.;
 const STOP: f64 = 4.;
 const RESOLUTION: usize = 100;
-fn param_gen(scan_point: &[(usize, usize)]) -> (f64, Parameters) {
-    let (x, resolution) = *scan_point.first().expect("one dimensional scan");
+fn compute_parameters((x, resolution): &(usize, usize)) -> (f64, Parameters) {
     (
         0.5,
         Parameters {
-            a: START + (x as f64 / resolution as f64) * (STOP - START),
+            a: START + (*x as f64 / *resolution as f64) * (STOP - START),
         },
     )
 }
@@ -58,6 +57,7 @@ fn project_results(
 }
 
 fn main() {
+    /*
     let max_period = 128;
     let iterations = 20_000;
     let delta = 1e-9;
@@ -72,14 +72,15 @@ fn main() {
         delta,
     };
 
-    let result = scan_function(
+    let result = scan(
         logistic,
         distance,
-        param_gen,
+        compute_parameters,
         scan_options,
         simulation_options,
     );
 
     write_results(result, project_results, "period.tnar")
         .expect("something went wrong while writing");
+    */
 }
