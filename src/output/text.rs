@@ -1,7 +1,4 @@
-use std::{
-    fs::{OpenOptions},
-    io::Write,
-};
+use std::{fs::OpenOptions, io::Write};
 
 use crate::simulate::SimulationResult;
 
@@ -14,6 +11,7 @@ pub fn write_results<S, P>(
 ) -> Result<()> {
     let mut output_file = OpenOptions::new()
         .create(true)
+        .truncate(true)
         .write(true)
         .open(file_name)?;
 

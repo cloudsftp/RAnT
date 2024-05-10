@@ -1,6 +1,5 @@
 pub mod generators;
 pub mod one;
-mod points;
 
 pub trait VectorGenerator {
     type Vector;

@@ -1,5 +1,4 @@
 use anyhow::anyhow;
-use rant::scan::generators::ScanOptions;
 use rant::simulate::simulate_function;
 use rant::util::tna::{assert_equals_tna_periods, read_tna_periods_file};
 
