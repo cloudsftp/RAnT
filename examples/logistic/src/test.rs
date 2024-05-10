@@ -18,7 +18,7 @@ fn unproject_initial_state_and_parameters(values: Vec<f64>) -> anyhow::Result<(f
     }
 }
 
-fn simulate(initial_state: &f64, parameters: &Parameters) {
+fn simulate(initial_state: &f64, parameters: &Parameters) -> SimulationResult<f64> {
     let max_period = 128;
     let iterations = 20_000;
     let delta = 1e-9;
@@ -35,7 +35,7 @@ fn simulate(initial_state: &f64, parameters: &Parameters) {
         *initial_state,
         parameters,
         &simulation_options,
-    );
+    )
 }
 
 #[test]
