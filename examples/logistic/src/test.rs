@@ -4,7 +4,7 @@ use rant::simulate::simulate_function;
 use rant::util::tna::{assert_equals_tna_periods, read_tna_periods_file};
 
 use rant::{
-    scan::{generators::VectorGenrator1D, scan},
+    scan::{generators::VectorGenerator1D, scan},
     simulate::SimulationOptions,
 };
 
@@ -46,7 +46,7 @@ fn period_test() {
     )
     .expect("problem while reading ant/test_data/period.tna");
 
-    let generator = VectorGenrator1D {
+    let generator = VectorGenerator1D {
         resolution: RESOLUTION,
     };
 
