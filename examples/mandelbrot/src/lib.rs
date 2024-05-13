@@ -2,9 +2,8 @@ use complex::C;
 
 pub mod complex;
 
-fn mandelbrot(z: C, a: &C) -> C {
-    let z2 = z.square();
-    z2 + *a
+pub fn mandelbrot(z: C, a: &C) -> C {
+    *a + z.square()
 }
 
 const ITERATIONS: usize = 1_000;
