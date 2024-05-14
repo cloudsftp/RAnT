@@ -8,10 +8,20 @@ pub fn mandelbrot(z: C, a: &C) -> C {
 
 const ITERATIONS: usize = 1_000;
 
-pub fn simulate(initial_state: &C, parameters: &C) -> C {
-    let mut z = *initial_state;
-    for _ in 0..ITERATIONS {
-        z = mandelbrot(z, parameters);
+pub fn condition(z: &C) -> bool {
+    false
+}
+
+pub fn simulate(initial_state: C, parameters: &C) -> Option<usize> {
+    let mut x = initial_state;
+
+    for i in 0..ITERATIONS {
+        x = mandelbrot(x, &parameters);
+
+        if condition(&x) {
+            return Some(i);
+        }
     }
-    z
+
+    None
 }

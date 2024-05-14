@@ -1,7 +1,7 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use mandelbrot::{complex::C, mandelbrot};
+use mandelbrot::{complex::C, condition, mandelbrot, simulate};
 use rant::{
-    scan::{adapters::ParameterAdapter2DEven, generators::VectorGenerator2D, scan},
+    scan::{adapters::ParameterAdapter2DEven, generators::VectorGenerator2D, scan, scan_fn},
     simulate::condition::ConditionSimulator,
 };
 
@@ -16,7 +16,7 @@ fn scan_bench(c: &mut Criterion) {
     let start = (-2., -1.5);
     let end = (2., 1.5);
 
-    let bench_function = group.bench_function("simple scan of mandelbrot function move", |b| {
+    group.bench_function("simple scan of mandelbrot function with trait", |b| {
         b.iter(|| {
             let generator = VectorGenerator2D { resolution };
             let parameter_adapter = ParameterAdapter2DEven {
@@ -27,10 +27,21 @@ fn scan_bench(c: &mut Criterion) {
             let simulator = ConditionSimulator {
                 max_iterations: 1_000,
                 function: mandelbrot,
-                condition: |_| false,
+                condition,
             };
             let result = scan(generator, parameter_adapter, simulator);
-            print!("{:?}", result.last().unwrap());
+        })
+    });
+
+    group.bench_function("simple scan of mandelbrot function with function", |b| {
+        b.iter(|| {
+            let generator = VectorGenerator2D { resolution };
+            let parameter_adapter = ParameterAdapter2DEven {
+                start,
+                end,
+                construct_initial_state_and_parameters: construct_parameters,
+            };
+            let result = scan_fn(generator, parameter_adapter, simulate);
         })
     });
 

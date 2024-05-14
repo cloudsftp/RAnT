@@ -37,3 +37,25 @@ where
 
     results
 }
+
+pub fn scan_fn<Vector, State, Parameters, Result>(
+    vector_generator: impl VectorGenerator<Vector = Vector>,
+    parameter_adapter: impl ParameterAdapter<State, Parameters, Vector = Vector>,
+    simulate: impl Fn(State, &Parameters) -> Result,
+) -> Vec<(State, Parameters, Result)>
+where
+    State: Default + Clone,
+{
+    let scan_points = vector_generator.generate_scan_vectors();
+    let mut results = Vec::with_capacity(vector_generator.size_hint());
+
+    for scan_point in scan_points {
+        let (initial_state, parameters) =
+            parameter_adapter.compute_initial_state_and_parameters(scan_point);
+
+        let result = simulate(initial_state.clone(), &parameters);
+        results.push((initial_state, parameters, result));
+    }
+
+    results
+}
