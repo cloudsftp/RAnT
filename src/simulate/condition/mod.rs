@@ -1,25 +1,23 @@
-use super::Simulator;
-
-pub struct ConditionSimulator<State, Parameters> {
+pub struct SimulationOptions {
     pub max_iterations: usize,
-    pub function: fn(State, &Parameters) -> State,
-    pub condition: fn(&State) -> bool,
 }
 
-impl<State, Parameters> Simulator<State, Parameters> for ConditionSimulator<State, Parameters> {
-    type Result = Option<usize>;
+pub fn simulate<State, Parameters>(
+    initial_state: State,
+    parameters: &Parameters,
+    function: impl Fn(State, &Parameters) -> State,
+    condition: impl Fn(&State) -> bool,
+    options: SimulationOptions,
+) -> Option<usize> {
+    let mut x = initial_state;
 
-    fn simulate(&self, initial_state: State, parameters: &Parameters) -> Self::Result {
-        let mut x = initial_state;
+    for i in 0..options.max_iterations {
+        x = function(x, parameters);
 
-        for i in 0..self.max_iterations {
-            x = (self.function)(x, &parameters);
-
-            if (self.condition)(&x) {
-                return Some(i);
-            }
+        if condition(&x) {
+            return Some(i);
         }
-
-        None
     }
+
+    None
 }

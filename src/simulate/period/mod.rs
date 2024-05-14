@@ -1,5 +1,3 @@
-use super::Simulator;
-
 #[cfg(test)]
 mod test;
 
@@ -7,12 +5,6 @@ pub struct SimulationOptions {
     pub iterations: usize,
     pub max_period: usize,
     pub delta: f64,
-}
-
-pub struct PeriodSimulator<State, Parameters> {
-    function: fn(State, &Parameters) -> State,
-    distance: fn(&State, &State) -> f64,
-    simulation_options: SimulationOptions,
 }
 
 #[derive(Debug, PartialEq)]
@@ -36,37 +28,39 @@ where
     }
 }
 
-impl<State, Parameters> Simulator<State, Parameters> for PeriodSimulator<State, Parameters>
+pub fn simulate<State, Parameters>(
+    initial_state: State,
+    parameters: &Parameters,
+    function: impl Fn(State, &Parameters) -> State,
+    distance: impl Fn(&State, &State) -> f64,
+    options: SimulationOptions,
+) -> Cycle<State>
 where
     State: Default + Copy,
 {
-    type Result = Cycle<State>;
+    let history_length = options.max_period;
+    let mut history = vec![State::default(); history_length];
+    let mut x = initial_state;
 
-    fn simulate(&self, initial_state: State, parameters: &Parameters) -> Self::Result {
-        let history_length = self.simulation_options.max_period;
-        let mut history = vec![State::default(); history_length];
-        let mut x = initial_state;
+    for _ in 0..options.iterations - history_length {
+        x = function(x, parameters);
+    }
 
-        for _ in 0..self.simulation_options.iterations - history_length {
-            x = (self.function)(x, parameters);
-        }
+    for item in history.iter_mut() {
+        // TODO: earlier checks for cycles
+        *item = x;
+        x = function(x, parameters);
+    }
 
-        for item in history.iter_mut() {
-            // TODO: earlier checks for cycles
-            *item = x;
-            x = (self.function)(x, parameters);
-        }
+    let last_encounter = history
+        .iter()
+        .rev()
+        .take(options.max_period)
+        .position(|h| distance(h, &x) < options.delta)
+        .map(|pos| history_length - pos - 1);
 
-        let last_encounter = history
-            .iter()
-            .rev()
-            .take(self.simulation_options.max_period)
-            .position(|h| (self.distance)(h, &x) < self.simulation_options.delta)
-            .map(|pos| history_length - pos - 1);
-
-        match last_encounter {
-            Some(last_encounter) => Cycle::from_history(&history, last_encounter),
-            None => Cycle::Divergence, // TODO: rotate history and return it also
-        }
+    match last_encounter {
+        Some(last_encounter) => Cycle::from_history(&history, last_encounter),
+        None => Cycle::Divergence, // TODO: rotate history and return it also
     }
 }
