@@ -1,5 +1,5 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use mandelbrot::{complex::C, simulate};
+use mandelbrot::{complex::C, simulate_mandelbrot};
 use rant::scan::{adapters::ParameterAdapter2DEven, generators::VectorGenerator2D, scan};
 
 fn construct_parameters(x: f64, y: f64) -> (C, C) {
@@ -21,7 +21,7 @@ fn scan_bench(c: &mut Criterion) {
                 end,
                 construct_initial_state_and_parameters: construct_parameters,
             };
-            let result = scan(generator, parameter_adapter, simulate);
+            let _ = scan(generator, parameter_adapter, simulate_mandelbrot);
         })
     });
 

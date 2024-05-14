@@ -1,4 +1,5 @@
 use complex::C;
+use rant::simulate::condition::{simulate, SimulationOptions};
 
 pub mod complex;
 
@@ -6,22 +7,18 @@ pub fn mandelbrot(z: C, a: &C) -> C {
     *a + z.square()
 }
 
-const ITERATIONS: usize = 1_000;
-
-pub fn condition(z: &C) -> bool {
+pub fn condition(_z: &C) -> bool {
     false
 }
 
-pub fn simulate(initial_state: C, parameters: &C) -> Option<usize> {
-    let mut x = initial_state;
-
-    for i in 0..ITERATIONS {
-        x = mandelbrot(x, &parameters);
-
-        if condition(&x) {
-            return Some(i);
-        }
-    }
-
-    None
+pub fn simulate_mandelbrot(initial_state: C, parameters: &C) -> Option<usize> {
+    simulate(
+        initial_state,
+        parameters,
+        mandelbrot,
+        condition,
+        SimulationOptions {
+            max_iterations: 1_000,
+        },
+    )
 }

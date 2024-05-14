@@ -1,11 +1,7 @@
 #[cfg(test)]
 mod test;
 
-use rant::{
-    output::text::write_results,
-    scan::scan,
-    simulate::{Cycle, SimulationOptions, SimulationResult},
-};
+use rant::simulate::period::Cycle;
 
 use std::cmp::Ordering;
 
@@ -37,12 +33,8 @@ fn construct_parameters(a: f64) -> (f64, Parameters) {
     (0.5, Parameters { a })
 }
 
-fn project_results(
-    _: &f64,
-    parameters: &Parameters,
-    result: &SimulationResult<f64>,
-) -> Option<String> {
-    let period = match &result.cycle {
+fn project_results(_: &f64, parameters: &Parameters, result: &Cycle<f64>) -> Option<String> {
+    let period = match &result {
         Cycle::FixedPoint(_) => 1,
         Cycle::Cycle(cycle) => cycle.len(),
         Cycle::Divergence => 0,

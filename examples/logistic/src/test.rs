@@ -1,11 +1,11 @@
 use anyhow::anyhow;
 use rant::scan::adapters::ParameterAdapter1DEven;
-use rant::simulate::simulate_function;
+use rant::simulate::period::simulate;
 use rant::util::tna::{assert_equals_tna_periods, read_tna_periods_file};
 
 use rant::{
     scan::{generators::VectorGenerator1D, scan},
-    simulate::SimulationOptions,
+    simulate::period::SimulationOptions,
 };
 
 use super::*;
@@ -18,7 +18,7 @@ fn unproject_initial_state_and_parameters(values: Vec<f64>) -> anyhow::Result<(f
     }
 }
 
-fn simulate(initial_state: &f64, parameters: &Parameters) -> SimulationResult<f64> {
+fn simulate_logistic(initial_state: f64, parameters: &Parameters) -> Cycle<f64> {
     let max_period = 128;
     let iterations = 20_000;
     let delta = 1e-9;
@@ -29,12 +29,12 @@ fn simulate(initial_state: &f64, parameters: &Parameters) -> SimulationResult<f6
         delta,
     };
 
-    simulate_function(
-        &logistic,
-        &distance,
-        *initial_state,
+    simulate(
+        initial_state,
         parameters,
-        &simulation_options,
+        logistic,
+        distance,
+        simulation_options,
     )
 }
 
@@ -58,7 +58,7 @@ fn period_test() {
         end,
         construct_initial_state_and_parameters: construct_parameters,
     };
-    let rant_result = scan(generator, parameter_adapter, simulate);
+    let rant_result = scan(generator, parameter_adapter, simulate_logistic);
 
     assert_equals_tna_periods(rant_result, ant_result, compare_states, compare_parameters);
 }
