@@ -1,12 +1,12 @@
 use std::{fs::OpenOptions, io::Write};
 
-use crate::simulate::SimulationResult;
+use crate::simulate::period::Cycle;
 
 use std::io::Result;
 
 pub fn write_results<S, P>(
-    results: Vec<(S, P, SimulationResult<S>)>,
-    projection: impl Fn(&S, &P, &SimulationResult<S>) -> Option<String>,
+    results: Vec<(S, P, Cycle<S>)>,
+    projection: impl Fn(&S, &P, &Cycle<S>) -> Option<String>,
     file_name: &str,
 ) -> Result<()> {
     let mut output_file = OpenOptions::new()

@@ -1,3 +1,5 @@
+use crate::simulate::Simulator;
+
 pub mod adapters;
 pub mod generators;
 
@@ -12,12 +14,6 @@ pub trait ParameterAdapter<State, Parameters> {
     type Vector;
 
     fn compute_initial_state_and_parameters(&self, vector: Self::Vector) -> (State, Parameters);
-}
-
-pub trait Simulator<State, Parameters> {
-    type Result;
-
-    fn simulate(&self, initial_state: State, parameters: &Parameters) -> Self::Result;
 }
 
 pub fn scan<Vector, State, Parameters, Result>(

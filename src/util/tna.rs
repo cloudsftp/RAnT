@@ -2,7 +2,7 @@ use std::{cmp::Ordering, fmt::Debug, fs::read_to_string};
 
 use thiserror::Error;
 
-use crate::simulate::SimulationResult;
+use crate::simulate::period::Cycle;
 
 pub fn read_tna_file(path: &str) -> anyhow::Result<Vec<Vec<f64>>> {
     let content = read_to_string(path)?;
@@ -42,7 +42,7 @@ pub fn read_tna_periods_file<S, P>(
 }
 
 pub fn assert_equals_tna_periods<S, P>(
-    mut rant_result: Vec<(S, P, SimulationResult<S>)>,
+    mut rant_result: Vec<(S, P, Cycle<S>)>,
     mut ant_result: Vec<(S, P, usize)>,
     compare_states: impl Fn(&S, &S) -> Ordering,
     compare_parameters: impl Fn(&P, &P) -> Ordering,
@@ -66,8 +66,8 @@ pub fn assert_equals_tna_periods<S, P>(
     for ((_, rant_parameters, rant_result), (_, ant_parameters, ant_result)) in
         rant_result.into_iter().zip(ant_result)
     {
-        match rant_result.cycle {
-            crate::simulate::Cycle::FixedPoint(p) => {
+        match rant_result {
+            Cycle::FixedPoint(p) => {
                 if ant_result != 1 {
                     differences.push(format!(
                         "RAnT found fixed point {:?} for parameters {:?}, AnT got cycle of length {} (parameters: {:?})",
@@ -75,8 +75,7 @@ pub fn assert_equals_tna_periods<S, P>(
                     ))
                 }
             }
-
-            crate::simulate::Cycle::Cycle(c) => {
+            Cycle::Cycle(c) => {
                 if ant_result != c.len() {
                     differences.push(format!(
                         "RAnT has cycle of length {} for parameters {:?}, AnT got {} (parameters: {:?}) - rant cycle: {:?}",
@@ -84,7 +83,7 @@ pub fn assert_equals_tna_periods<S, P>(
                     ))
                 }
             }
-            crate::simulate::Cycle::Divergence => {
+            Cycle::Divergence => {
                 if ant_result != 0 {
                     differences.push(format!(
                         "RAnT found divergence for parameters {:?}, AnT got cycle of length {} (parameters: {:?})",
