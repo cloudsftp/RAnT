@@ -56,7 +56,7 @@ pub fn scan_parallel<Vector, State, Parameters, Result>(
         + Send
         + Sync
         + 'static,
-    simulate: impl Fn(State, &Parameters) -> Result,
+    simulate: impl Fn(State, &Parameters) -> Result + Clone + Send + 'static,
 ) -> Vec<(State, Parameters, Result)>
 where
     Vector: Send + 'static,
@@ -64,7 +64,7 @@ where
     Parameters: Send + 'static,
     Result: Send + 'static,
 {
-    let num_workers = 8; // TODO: as optional parameter, else depending on processor
+    let num_workers = 4; // TODO: as optional parameter, else depending on processor
 
     let mut results = Vec::with_capacity(vector_generator.size_hint());
 
@@ -78,14 +78,16 @@ where
         let scan_vector_receiver = scan_vector_receiver.clone();
         let result_sender = result_sender.clone();
         let parameter_adapter = parameter_adapter.clone();
+        let simulate = simulate.clone();
 
         let worker_thread = thread::spawn(move || {
             for scan_vector_chunk in scan_vector_receiver {
-                let results = Vec::with_capacity(scan_vector_chunk.len());
+                let mut results = Vec::with_capacity(scan_vector_chunk.len());
                 for scan_vector in scan_vector_chunk {
                     let (initial_state, parameters) =
                         parameter_adapter.compute_initial_state_and_parameters(scan_vector);
-                    //                let result = simulate(initial_state, &parameters);
+                    let result = simulate(initial_state.clone(), &parameters);
+                    results.push((initial_state, parameters, result));
                 }
                 result_sender.send(results).expect("could not send results");
             }
