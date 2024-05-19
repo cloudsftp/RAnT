@@ -1,4 +1,6 @@
-use std::thread;
+use std::{pin::Pin, thread};
+
+use rayon::prelude::*;
 
 pub mod adapters;
 pub mod generators;
@@ -13,7 +15,9 @@ pub trait VectorGenerator {
 pub trait ParallelVectorGenerator {
     type Vector;
 
-    fn generate_scan_vectors(&self) -> impl Iterator<Item = Vec<Self::Vector>>;
+    fn generate_scan_vectors(
+        self,
+    ) -> impl Iterator<Item = impl Iterator<Item = Self::Vector> + Send> + Send;
     fn num_chunks(&self) -> usize;
     fn size_hint(&self) -> usize;
 }
@@ -46,8 +50,40 @@ where
     results
 }
 
-// TODO: remove expects
 pub fn scan_parallel<Vector, State, Parameters, Result>(
+    vector_generator: impl ParallelVectorGenerator<Vector = Vector> + 'static,
+    parameter_adapter: impl ParameterAdapter<State, Parameters, Vector = Vector>
+        + Sync
+        + Send
+        + Copy
+        + 'static,
+    simulate: impl Fn(State, &Parameters) -> Result + Sync + Send + Copy + 'static,
+) -> Vec<(State, Parameters, Result)>
+where
+    Vector: Send,
+    State: Default + Clone + Send + Sync,
+    Parameters: Send + Sync,
+    Result: Send + Sync,
+{
+    vector_generator
+        .generate_scan_vectors()
+        .par_bridge()
+        .map(move |scan_points| {
+            scan_points.map(move |scan_point| {
+                let (initial_state, parameters) =
+                    parameter_adapter.compute_initial_state_and_parameters(scan_point);
+
+                let result = simulate(initial_state.clone(), &parameters);
+                (initial_state, parameters, result)
+            })
+        })
+        .flatten_iter()
+        .collect()
+}
+
+// TODO: remove expects
+/*
+pub fn scan_parallel_channels<Vector, State, Parameters, Result>(
     vector_generator: impl ParallelVectorGenerator<Vector = Vector> + Send + 'static,
     parameter_adapter: impl ParameterAdapter<State, Parameters, Vector = Vector>
         + Clone
@@ -62,12 +98,12 @@ where
     Parameters: Send + 'static,
     Result: Send + 'static,
 {
-    let num_workers = 4; // TODO: as optional parameter, else depending on processor
+    let num_workers = 12; // TODO: as optional parameter, else depending on processor
 
     let mut results = Vec::with_capacity(vector_generator.size_hint());
 
     let (scan_vector_sender, scan_vector_receiver) =
-        crossbeam_channel::bounded::<Vec<Vector>>(num_workers);
+        crossbeam_channel::bounded::<Box<dyn Iterator<Item = Vector> + Send>>(num_workers);
     let (result_sender, result_receiver) =
         crossbeam_channel::bounded::<Vec<(State, Parameters, Result)>>(num_workers);
 
@@ -80,13 +116,14 @@ where
 
         let worker_thread = thread::spawn(move || {
             for scan_vector_chunk in scan_vector_receiver {
-                let mut results = Vec::with_capacity(scan_vector_chunk.len());
-                for scan_vector in scan_vector_chunk {
-                    let (initial_state, parameters) =
-                        parameter_adapter.compute_initial_state_and_parameters(scan_vector);
-                    let result = simulate(initial_state.clone(), &parameters);
-                    results.push((initial_state, parameters, result));
-                }
+                let results = scan_vector_chunk
+                    .map(|scan_vector| {
+                        let (initial_state, parameters) =
+                            parameter_adapter.compute_initial_state_and_parameters(scan_vector);
+                        let result = simulate(initial_state.clone(), &parameters);
+                        (initial_state, parameters, result)
+                    })
+                    .collect();
                 result_sender.send(results).expect("could not send results");
             }
         });
@@ -98,7 +135,7 @@ where
         let scan_point_chunks = vector_generator.generate_scan_vectors();
         for chunk in scan_point_chunks {
             scan_vector_sender
-                .send(chunk)
+                .send(Box::new(chunk))
                 .expect("could not send scan vector chunk")
         }
     });
@@ -117,3 +154,4 @@ where
 
     results
 }
+*/

@@ -48,12 +48,10 @@ pub struct ParallelVectorGenerator2D {
 impl ParallelVectorGenerator for ParallelVectorGenerator2D {
     type Vector = [(usize, usize); 2];
 
-    fn generate_scan_vectors(&self) -> impl Iterator<Item = Vec<Self::Vector>> {
+    fn generate_scan_vectors(self) -> impl Iterator<Item = impl Iterator<Item = Self::Vector>> {
         let (resolution_chunks, resolution_points) = self.resolution;
         (0..=resolution_chunks).map(move |x| {
-            (0..=resolution_points)
-                .map(move |y| [(x, resolution_chunks), (y, resolution_points)])
-                .collect()
+            (0..=resolution_points).map(move |y| [(x, resolution_chunks), (y, resolution_points)])
         })
     }
 

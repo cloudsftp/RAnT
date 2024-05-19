@@ -13,7 +13,7 @@ fn construct_parameters(x: f64, y: f64) -> (C, C) {
 fn scan_bench(c: &mut Criterion) {
     let mut group = c.benchmark_group("scan");
 
-    let resolution = (100, 100);
+    let resolution = (10_000, 10_000);
     let start = (-2., -1.5);
     let end = (2., 1.5);
 
@@ -44,5 +44,9 @@ fn scan_bench(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(benches, scan_bench);
+criterion_group!(
+    name = benches;
+    config = Criterion::default().sample_size(10);
+    targets = scan_bench
+);
 criterion_main!(benches);

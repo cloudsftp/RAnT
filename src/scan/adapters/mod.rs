@@ -1,6 +1,6 @@
 use super::ParameterAdapter;
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct ParameterAdapter1DEven<State, Parameters> {
     pub start: f64,
     pub end: f64,
@@ -21,7 +21,7 @@ impl<State, Parameters> ParameterAdapter<State, Parameters>
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct ParameterAdapter2DEven<State, Parameters> {
     pub start: (f64, f64),
     pub end: (f64, f64),
