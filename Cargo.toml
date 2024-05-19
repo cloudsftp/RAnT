@@ -9,6 +9,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.82"
+crossbeam-channel = "0.5.12"
 thiserror = "1.0.59"
 
 [dev-dependencies]

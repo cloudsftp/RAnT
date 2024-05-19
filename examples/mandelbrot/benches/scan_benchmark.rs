@@ -1,6 +1,10 @@
 use criterion::{criterion_group, criterion_main, Criterion};
 use mandelbrot::{complex::C, simulate_mandelbrot};
-use rant::scan::{adapters::ParameterAdapter2DEven, generators::VectorGenerator2D, scan};
+use rant::scan::{
+    adapters::ParameterAdapter2DEven,
+    generators::{ParallelVectorGenerator2D, VectorGenerator2D},
+    scan, scan_parallel,
+};
 
 fn construct_parameters(x: f64, y: f64) -> (C, C) {
     (C::new(0., 0.), C::new(x, y))
@@ -22,6 +26,18 @@ fn scan_bench(c: &mut Criterion) {
                 construct_initial_state_and_parameters: construct_parameters,
             };
             let _ = scan(generator, parameter_adapter, simulate_mandelbrot);
+        })
+    });
+
+    group.bench_function("parallel scan of mandelbrot function", |b| {
+        b.iter(|| {
+            let parallel_generator = ParallelVectorGenerator2D { resolution };
+            let parameter_adapter = ParameterAdapter2DEven {
+                start,
+                end,
+                construct_initial_state_and_parameters: construct_parameters,
+            };
+            let _ = scan_parallel(parallel_generator, parameter_adapter, simulate_mandelbrot);
         })
     });
 
