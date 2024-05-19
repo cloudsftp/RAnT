@@ -1,6 +1,4 @@
-use std::{thread, time::Duration};
-
-use crate::simulate::condition::simulate;
+use std::thread;
 
 pub mod adapters;
 pub mod generators;
