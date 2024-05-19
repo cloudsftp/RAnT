@@ -17,6 +17,10 @@ impl C {
             b: 2. * (self.a + self.b),
         }
     }
+
+    pub fn abs2(self) -> f64 {
+        self.a.powi(2) + self.b.powi(2)
+    }
 }
 
 impl Add for C {

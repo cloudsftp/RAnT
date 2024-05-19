@@ -7,8 +7,8 @@ pub fn mandelbrot(z: C, a: &C) -> C {
     *a + z.square()
 }
 
-pub fn condition(_z: &C) -> bool {
-    false
+pub fn condition(z: &C) -> bool {
+    z.abs2() > 4.
 }
 
 pub fn simulate_mandelbrot(initial_state: C, parameters: &C) -> Option<usize> {
