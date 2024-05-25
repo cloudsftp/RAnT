@@ -17,12 +17,22 @@ fn construct_parameters(x: f64, y: f64) -> (C, C) {
     (C::new(0., 0.), C::new(x, y))
 }
 
+fn project_result((_, parameter, result): (C, C, Option<usize>)) -> Vec<u8> {
+    format!("{:?} - {:?}\n", result, parameter).into_bytes()
+}
+
 fn scan_bench(c: &mut Criterion) {
     let mut group = c.benchmark_group("scan");
 
     let resolution = (1_000, 1_000);
-    let start = (-2., -1.5);
-    let end = (2., 1.5);
+    /* Interesting area to look at
+    let start = (-0.24, 0.9);
+    let end = (0.05, 1.15);
+    */
+
+    // In this area, the maximum number of iterations will be done
+    let start = (-0.1, 0.1);
+    let end = (-0.1, 0.1);
 
     group.bench_function("simple scan of mandelbrot function with function", |b| {
         b.iter(|| {
@@ -37,9 +47,7 @@ fn scan_bench(c: &mut Criterion) {
             let out_file = File::create("benches/output/mandelbrot_single_thread.tnar").unwrap();
             let mut out_file = BufWriter::new(out_file);
             for result in results {
-                out_file
-                    .write_all(format!("{:?}", result.2).as_bytes())
-                    .unwrap();
+                out_file.write_all(&project_result(result)).unwrap();
             }
             out_file.flush().unwrap();
         })
@@ -66,9 +74,7 @@ fn scan_bench(c: &mut Criterion) {
             let mut out_file = BufWriter::new(out_file);
             let writer_thread = thread::spawn(move || {
                 for result in receiver.iter().take(num_results) {
-                    out_file
-                        .write_all(format!("{:?}", result.2).as_bytes())
-                        .unwrap();
+                    out_file.write_all(&project_result(result)).unwrap();
                 }
 
                 out_file.flush().unwrap();
