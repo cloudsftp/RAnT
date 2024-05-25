@@ -53,7 +53,7 @@ pub fn scan_parallel<Vector, State, Parameters, Result>(
         + Copy
         + 'static,
     simulate: impl Fn(State, &Parameters) -> Result + Sync + Send + Copy + 'static,
-) -> impl ParallelIterator<Item = impl Iterator<Item = (State, Parameters, Result)>>
+) -> impl ParallelIterator<Item = (State, Parameters, Result)>
 where
     Vector: Send,
     State: Default + Clone + Send + Sync,
@@ -72,6 +72,7 @@ where
                 (initial_state, parameters, result)
             })
         })
+        .flatten_iter()
 }
 
 // TODO: remove expects

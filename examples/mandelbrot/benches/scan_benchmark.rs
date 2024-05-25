@@ -80,10 +80,8 @@ fn scan_bench(c: &mut Criterion) {
                 out_file.flush().unwrap();
             });
 
-            results.for_each_with(sender, |sender, chunk| {
-                for result in chunk {
-                    sender.send(result).unwrap();
-                }
+            results.for_each_with(sender, |sender, result| {
+                sender.send(result).unwrap();
             });
 
             writer_thread.join().unwrap();
