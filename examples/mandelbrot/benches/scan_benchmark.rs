@@ -1,10 +1,17 @@
+use std::{
+    fs::File,
+    io::{BufWriter, Write},
+    thread,
+};
+
 use criterion::{criterion_group, criterion_main, Criterion};
 use mandelbrot::{complex::C, simulate_mandelbrot};
 use rant::scan::{
     adapters::ParameterAdapter2DEven,
     generators::{ParallelVectorGenerator2D, VectorGenerator2D},
-    scan, scan_parallel,
+    scan, scan_parallel, ParallelVectorGenerator,
 };
+use rayon::iter::ParallelIterator;
 
 fn construct_parameters(x: f64, y: f64) -> (C, C) {
     (C::new(0., 0.), C::new(x, y))
@@ -13,7 +20,7 @@ fn construct_parameters(x: f64, y: f64) -> (C, C) {
 fn scan_bench(c: &mut Criterion) {
     let mut group = c.benchmark_group("scan");
 
-    let resolution = (10_000, 10_000);
+    let resolution = (1_000, 1_000);
     let start = (-2., -1.5);
     let end = (2., 1.5);
 
@@ -25,7 +32,16 @@ fn scan_bench(c: &mut Criterion) {
                 end,
                 construct_initial_state_and_parameters: construct_parameters,
             };
-            let _ = scan(generator, parameter_adapter, simulate_mandelbrot);
+            let results = scan(generator, parameter_adapter, simulate_mandelbrot);
+
+            let out_file = File::create("benches/output/mandelbrot_single_thread.tnar").unwrap();
+            let mut out_file = BufWriter::new(out_file);
+            for result in results {
+                out_file
+                    .write_all(format!("{:?}", result.2).as_bytes())
+                    .unwrap();
+            }
+            out_file.flush().unwrap();
         })
     });
 
@@ -37,7 +53,34 @@ fn scan_bench(c: &mut Criterion) {
                 end,
                 construct_initial_state_and_parameters: construct_parameters,
             };
-            let _ = scan_parallel(parallel_generator, parameter_adapter, simulate_mandelbrot);
+            let results = scan_parallel(
+                parallel_generator.clone(),
+                parameter_adapter,
+                simulate_mandelbrot,
+            );
+            let num_results = parallel_generator.size_hint();
+
+            let (sender, receiver) = crossbeam_channel::unbounded::<(C, C, Option<usize>)>();
+
+            let out_file = File::create("benches/output/mandelbrot_multi_thread.tnar").unwrap();
+            let mut out_file = BufWriter::new(out_file);
+            let writer_thread = thread::spawn(move || {
+                for result in receiver.iter().take(num_results) {
+                    out_file
+                        .write_all(format!("{:?}", result.2).as_bytes())
+                        .unwrap();
+                }
+
+                out_file.flush().unwrap();
+            });
+
+            results.for_each_with(sender, |sender, chunk| {
+                for result in chunk {
+                    sender.send(result).unwrap();
+                }
+            });
+
+            writer_thread.join().unwrap();
         })
     });
 

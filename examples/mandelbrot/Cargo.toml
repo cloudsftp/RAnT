@@ -7,7 +7,9 @@ edition = "2021"
 
 [dependencies]
 criterion = "0.5.1"
+crossbeam-channel = "0.5.13"
 rant = { path="../.." }
+rayon = "1.10.0"
 
 [[bench]]
 name="scan_benchmark"
