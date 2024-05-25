@@ -58,7 +58,7 @@ fn period_test() {
         end,
         construct_initial_state_and_parameters: construct_parameters,
     };
-    let rant_result = scan(generator, parameter_adapter, simulate_logistic);
+    let rant_result = scan(generator, parameter_adapter, simulate_logistic).collect();
 
     assert_equals_tna_periods(rant_result, ant_result, compare_states, compare_parameters);
 }
