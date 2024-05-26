@@ -16,8 +16,8 @@ const OUT_FILE_NAME: &str = "benches/output/mandelbrot.png";
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let resolution = (1_000usize, 1_000usize);
 
-    let start = (-0.24, 0.9);
-    let end = (0.05, 1.15);
+    let start = (-2., -1.5);
+    let end = (1., 1.5);
 
     let root = BitMapBackend::new(
         OUT_FILE_NAME,
@@ -62,13 +62,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             sender.send(result).unwrap();
         });
     });
-
-    let range = plotting_area.get_pixel_range();
-
-    let (pw, ph) = (range.0.end - range.0.start, range.1.end - range.1.start);
-    let (xr, yr) = (chart.x_range(), chart.y_range());
-
-    println!("{:?}, {:?}, {:?}, {:?}", pw, ph, xr, yr);
 
     for (_, parameter, result) in receiver.iter().take(num_results) {
         if let Some(result) = result {

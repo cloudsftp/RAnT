@@ -13,7 +13,7 @@ impl C {
 
     pub fn square(self) -> Self {
         Self {
-            a: self.a.powi(2) + self.b.powi(2),
+            a: self.a.powi(2) - self.b.powi(2),
             b: 2. * self.a * self.b,
         }
     }
@@ -53,6 +53,10 @@ mod test {
             SquareTestCase {
                 input: C::new(1., 0.),
                 output: C::new(1., 0.),
+            },
+            SquareTestCase {
+                input: C::new(0., 1.),
+                output: C::new(-1., 0.),
             },
         ];
 
