@@ -16,7 +16,7 @@ impl VectorGenerator for VectorGenerator1D {
     }
 
     fn size_hint(&self) -> usize {
-        self.resolution
+        self.resolution + 1
     }
 }
 
@@ -35,7 +35,7 @@ impl VectorGenerator for VectorGenerator2D {
     }
 
     fn size_hint(&self) -> usize {
-        self.resolution.0 * self.resolution.1
+        (self.resolution.0 + 1) * (self.resolution.1 + 1)
     }
 }
 
@@ -56,10 +56,10 @@ impl ParallelVectorGenerator for ParallelVectorGenerator2D {
     }
 
     fn num_chunks(&self) -> usize {
-        self.resolution.0
+        self.resolution.0 + 1
     }
 
     fn size_hint(&self) -> usize {
-        self.resolution.0 * self.resolution.1
+        (self.resolution.0 + 1) * (self.resolution.1 + 1)
     }
 }
