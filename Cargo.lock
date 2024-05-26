@@ -448,7 +448,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "criterion 0.4.0",
- "crossbeam-channel",
  "rayon",
  "thiserror",
 ]
