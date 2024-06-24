@@ -1,4 +1,4 @@
-workspace = { members = ["examples/logistic", "examples/mandelbrot"] }
+workspace = { members = ["examples/logistic", "examples/mandelbrot", "examples/differential/exponential"] }
 
 [package]
 name = "rant"

@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use rant::scan::adapters::ParameterAdapter1DEven;
-use rant::simulate::period::simulate;
+use rant::simulate::period;
 use rant::util::tna::{assert_equals_tna_periods, read_tna_periods_file};
 
 use rant::{
@@ -29,7 +29,7 @@ fn simulate_logistic(initial_state: f64, parameters: &Parameters) -> Cycle<f64> 
         delta,
     };
 
-    simulate(
+    period::simulate(
         initial_state,
         parameters,
         logistic,

@@ -16,8 +16,8 @@ const OUT_FILE_NAME: &str = "benches/output/mandelbrot.png";
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let resolution = (1_000usize, 1_000usize);
 
-    let start = (-2., -1.5);
-    let end = (1., 1.5);
+    let start = (-0.25, 0.8);
+    let end = (0.03, 1.15);
 
     let root = BitMapBackend::new(
         OUT_FILE_NAME,
@@ -67,7 +67,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if let Some(result) = result {
             plotting_area.draw_pixel(
                 (parameter.a, parameter.b),
-                &MandelbrotHSL::get_color(result as f64 / 100.),
+                &MandelbrotHSL::get_color(result as f64 / 200.),
             )?;
         } else {
             plotting_area.draw_pixel((parameter.a, parameter.b), &BLACK)?;
