@@ -3,7 +3,11 @@ workspace = { members = ["examples/logistic", "examples/mandelbrot", "examples/d
 [package]
 name = "rant"
 version = "0.1.0"
+description = "Analysis Tool for Non-linear Dynamical Systems written in Rust"
+repository = "https://github.com/cloudsftp/RAnT"
+
 edition = "2021"
+license = "GPLv3"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
