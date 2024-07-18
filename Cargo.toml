@@ -1,7 +1,7 @@
 workspace = { members = ["examples/logistic", "examples/mandelbrot", "examples/differential/exponential"] }
 
 [package]
-name = "rant"
+name = "rant-simulator"
 version = "0.1.0"
 description = "Analysis Tool for Non-linear Dynamical Systems written in Rust"
 repository = "https://github.com/cloudsftp/RAnT"
