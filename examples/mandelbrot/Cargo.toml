@@ -9,7 +9,7 @@ edition = "2021"
 criterion = "0.5.1"
 crossbeam-channel = "0.5.13"
 plotters = "0.3.6"
-rant = { path="../.." }
+rantlib = { path="../.." }
 rayon = "1.10.0"
 
 [[bench]]

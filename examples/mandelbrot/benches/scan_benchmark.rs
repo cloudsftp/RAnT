@@ -6,7 +6,7 @@ use std::{
 
 use criterion::{criterion_group, criterion_main, Criterion};
 use mandelbrot::{complex::C, simulate_mandelbrot};
-use rant::scan::{
+use rantlib::scan::{
     adapters::ParameterAdapter2DEven,
     generators::{ParallelVectorGenerator2D, VectorGenerator2D},
     scan, scan_parallel, ParallelVectorGenerator,

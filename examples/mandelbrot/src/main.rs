@@ -2,7 +2,7 @@ use std::thread;
 
 use mandelbrot::{complex::C, simulate_mandelbrot};
 use plotters::prelude::*;
-use rant::scan::{
+use rantlib::scan::{
     adapters::ParameterAdapter2DEven, generators::ParallelVectorGenerator2D, scan_parallel,
     ParallelVectorGenerator,
 };

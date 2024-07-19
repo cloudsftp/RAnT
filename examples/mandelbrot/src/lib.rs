@@ -1,5 +1,5 @@
 use complex::C;
-use rant::simulate::condition::{simulate, SimulationOptions};
+use rantlib::simulate::condition::{simulate, SimulationOptions};
 
 pub mod complex;
 

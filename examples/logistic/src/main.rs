@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod test;
 
-use rant::simulate::period::Cycle;
+use rantlib::simulate::period::Cycle;
 
 use std::cmp::Ordering;
 

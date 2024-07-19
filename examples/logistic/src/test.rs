@@ -1,9 +1,9 @@
 use anyhow::anyhow;
-use rant::scan::adapters::ParameterAdapter1DEven;
-use rant::simulate::period;
-use rant::util::tna::{assert_equals_tna_periods, read_tna_periods_file};
+use rantlib::scan::adapters::ParameterAdapter1DEven;
+use rantlib::simulate::period;
+use rantlib::util::tna::{assert_equals_tna_periods, read_tna_periods_file};
 
-use rant::{
+use rantlib::{
     scan::{generators::VectorGenerator1D, scan},
     simulate::period::SimulationOptions,
 };

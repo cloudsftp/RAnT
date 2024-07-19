@@ -1,4 +1,4 @@
-use rant::{
+use rantlib::{
     output::text::write_results,
     scan::{adapters::ParameterAdapter1DEven, generators::VectorGenerator1D, scan},
 };

@@ -434,7 +434,7 @@ name = "exponential"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "rant",
+ "rantlib",
 ]
 
 [[package]]
@@ -708,7 +708,7 @@ name = "logistic"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "rant",
+ "rantlib",
 ]
 
 [[package]]
@@ -718,7 +718,7 @@ dependencies = [
  "criterion 0.5.1",
  "crossbeam-channel",
  "plotters",
- "rant",
+ "rantlib",
  "rayon",
 ]
 
@@ -868,7 +868,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rant"
+name = "rantlib"
 version = "0.1.0"
 dependencies = [
  "anyhow",
