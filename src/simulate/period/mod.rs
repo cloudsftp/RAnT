@@ -1,3 +1,5 @@
+use anyhow::Error;
+
 #[cfg(test)]
 mod test;
 
@@ -31,10 +33,25 @@ where
 pub fn simulate<State, Parameters>(
     initial_state: State,
     parameters: &Parameters,
-    function: impl Fn(State, &Parameters) -> State,
+    map: impl Fn(State, &Parameters) -> State,
     distance: impl Fn(&State, &State) -> f64,
     options: SimulationOptions,
 ) -> Cycle<State>
+where
+    State: Default + Copy,
+{
+    let map = |state, parameters: &_| Ok(map(state, parameters));
+    simulate_fallible_map(initial_state, parameters, map, distance, options)
+        .expect("map will always return Ok")
+}
+
+pub fn simulate_fallible_map<State, Parameters>(
+    initial_state: State,
+    parameters: &Parameters,
+    function: impl Fn(State, &Parameters) -> Result<State, Error>,
+    distance: impl Fn(&State, &State) -> f64,
+    options: SimulationOptions,
+) -> Result<Cycle<State>, Error>
 where
     State: Default + Copy,
 {
@@ -43,13 +60,13 @@ where
     let mut x = initial_state;
 
     for _ in 0..options.iterations - history_length {
-        x = function(x, parameters);
+        x = function(x, parameters)?;
     }
 
     for item in history.iter_mut() {
         // TODO: earlier checks for cycles
         *item = x;
-        x = function(x, parameters);
+        x = function(x, parameters)?;
     }
 
     let last_encounter = history
@@ -59,8 +76,8 @@ where
         .position(|h| distance(h, &x) < options.delta)
         .map(|pos| history_length - pos - 1);
 
-    match last_encounter {
+    Ok(match last_encounter {
         Some(last_encounter) => Cycle::from_history(&history, last_encounter),
         None => Cycle::Divergence, // TODO: rotate history and return it also
-    }
+    })
 }
