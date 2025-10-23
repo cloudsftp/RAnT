@@ -7,6 +7,9 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
+      - name: Install fontconfig
+        run: sudo apt-get update && sudo apt-get install -y libfontconfig1-dev
+
       - uses: actions/checkout@v4
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
