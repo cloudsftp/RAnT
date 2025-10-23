@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use anyhow::Error;
 
 #[cfg(test)]
@@ -30,6 +32,18 @@ where
     }
 }
 
+#[derive(Debug, thiserror::Error)]
+pub enum SimulationError<Parameters>
+where
+    Parameters: Debug,
+{
+    #[error("error while executing function for parameters {parameters:?}: {nested}")]
+    FunctionError {
+        parameters: Parameters,
+        nested: Error,
+    },
+}
+
 pub fn simulate<State, Parameters>(
     initial_state: State,
     parameters: &Parameters,
@@ -39,6 +53,7 @@ pub fn simulate<State, Parameters>(
 ) -> Cycle<State>
 where
     State: Default + Copy,
+    Parameters: Debug,
 {
     let map = |state, parameters: &_| Ok(map(state, parameters));
     simulate_fallible_map(initial_state, parameters, map, distance, options)
@@ -54,19 +69,25 @@ pub fn simulate_fallible_map<State, Parameters>(
 ) -> Result<Cycle<State>, Error>
 where
     State: Default + Copy,
+    Parameters: Debug,
 {
+    let add_parameters = |err| SimulationError::FunctionError {
+        parameters: format!("{:?}", parameters),
+        nested: err,
+    };
+
     let history_length = options.max_period;
     let mut history = vec![State::default(); history_length];
     let mut x = initial_state;
 
     for _ in 0..options.iterations - history_length {
-        x = function(x, parameters)?;
+        x = function(x, parameters).map_err(add_parameters)?;
     }
 
     for item in history.iter_mut() {
         // TODO: earlier checks for cycles
         *item = x;
-        x = function(x, parameters)?;
+        x = function(x, parameters).map_err(add_parameters)?;
     }
 
     let last_encounter = history
