@@ -4,6 +4,7 @@ pub struct ScanOptions {
     pub resolutions: Vec<usize>,
 }
 
+#[derive(Debug, Clone)]
 pub struct VectorGenerator1D {
     pub resolution: usize,
 }
@@ -20,6 +21,7 @@ impl VectorGenerator for VectorGenerator1D {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct VectorGenerator2D {
     pub resolution: (usize, usize),
 }
