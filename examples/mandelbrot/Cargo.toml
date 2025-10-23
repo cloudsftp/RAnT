@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-criterion = "0.5.1"
+criterion = "0.7.0"
 crossbeam-channel = "0.5.15"
 plotters = "0.3.7"
 rantlib = { path="../.." }
