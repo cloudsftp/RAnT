@@ -6,15 +6,15 @@ version = "0.1.0"
 description = "Analysis Library for Non-linear Dynamical Systems written in Rust"
 repository = "https://github.com/cloudsftp/RAnT"
 
-edition = "2021"
+edition = "2024"
 license = "GPL-3.0-or-later"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.82"
-rayon = "1.10.0"
-thiserror = "1.0.59"
+anyhow = "1.0.100"
+rayon = "1.11.0"
+thiserror = "1.0.69"
 
 [dev-dependencies]
 criterion = { version = "0.4", features = ["html_reports"] }
