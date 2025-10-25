@@ -1,4 +1,4 @@
-use std::thread;
+use std::{fs, path::PathBuf, thread};
 
 use mandelbrot::{complex::C, simulate_mandelbrot};
 use plotters::prelude::*;
@@ -19,8 +19,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let start = (-0.25, 0.8);
     let end = (0.03, 1.15);
 
+    let out_file_name = PathBuf::from(OUT_FILE_NAME);
+    let out_dir_name = out_file_name
+        .parent()
+        .expect(format!("Could not get parent of").as_str());
+
+    fs::create_dir_all(out_dir_name).expect(
+        format!(
+            "Could not create directory {}",
+            out_dir_name.to_string_lossy()
+        )
+        .as_str(),
+    );
+
     let root = BitMapBackend::new(
-        OUT_FILE_NAME,
+        &out_file_name,
         (resolution.0 as u32 + 50, resolution.1 as u32 + 50),
     )
     .into_drawing_area();
@@ -76,8 +89,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     computing_thread.join().unwrap();
 
-    // To avoid the IO failure being ignored silently, we manually call the present function
-    root.present().expect("Unable to write result to file, please make sure 'plotters-doc-data' dir exists under current dir");
     println!("Result has been saved to {}", OUT_FILE_NAME);
 
     Ok(())
