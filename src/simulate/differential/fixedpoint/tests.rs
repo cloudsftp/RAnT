@@ -2,22 +2,35 @@ use approx::assert_relative_eq;
 
 use crate::simulate::differential::{
     fixedpoint::{simulate, SimulationOptions},
-    DifferentialState,
+    DifferentialState, StateDerivative,
 };
 
 #[test]
 fn fixed_point_1d() {
     #[derive(Debug, Clone, Copy)]
     struct State(f64);
+    #[derive(Debug)]
+    struct Derivative(f64);
+    #[derive(Debug)]
     struct Parameters(f64);
-    impl DifferentialState<Parameters> for State {
-        fn step(&self, parameters: &Parameters, t: f64) -> Self {
-            let differential = parameters.0 * self.0;
-            State(self.0 + t * differential)
+
+    impl DifferentialState<Parameters, Derivative> for State {
+        fn derive(&self, parameters: &Parameters) -> Derivative {
+            Derivative(self.0 * parameters.0)
+        }
+
+        fn step(&self, _: &Parameters, derivative: &Derivative, t: f64) -> Self {
+            State(self.0 + t * derivative.0)
         }
 
         fn distance(&self, other: &Self) -> f64 {
             (self.0 - other.0).abs()
+        }
+    }
+
+    impl StateDerivative for Derivative {
+        fn abs(&self) -> f64 {
+            self.0.abs()
         }
     }
 
@@ -26,8 +39,8 @@ fn fixed_point_1d() {
         &Parameters(-1.),
         SimulationOptions {
             time_step: 1e-3,
-            max_time: 1e9,
-            delta: 1e-12,
+            max_time: 1e3,
+            delta: 1e-9,
         },
     )
     .expect("did not find a fixed point");
