@@ -1,6 +1,7 @@
 /target
 
 *.tna
+*.tnar
 *.png
 
 examples/AnT
