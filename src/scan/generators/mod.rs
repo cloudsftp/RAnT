@@ -4,7 +4,7 @@ pub struct ScanOptions {
     pub resolutions: Vec<usize>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct VectorGenerator1D {
     pub resolution: usize,
 }
@@ -21,7 +21,7 @@ impl VectorGenerator for VectorGenerator1D {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct VectorGenerator2D {
     pub resolution: (usize, usize),
 }
@@ -42,7 +42,7 @@ impl VectorGenerator for VectorGenerator2D {
 }
 
 // TODO: maybe allow chunking by y?
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct ParallelVectorGenerator2D {
     pub resolution: (usize, usize),
 }
