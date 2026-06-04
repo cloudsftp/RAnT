@@ -7,13 +7,14 @@ use rantlib::{
     simulate::period::{simulate, Cycle, SimulationOptions},
 };
 
-use std::{cmp::Ordering, fmt::format};
+use std::cmp::Ordering;
 
 #[derive(Debug)]
 struct Parameters {
     a: f64,
 }
 
+#[allow(unused)]
 fn compare_parameters(a: &Parameters, b: &Parameters) -> Ordering {
     a.a.total_cmp(&b.a)
 }
@@ -26,14 +27,17 @@ fn distance(a: &f64, b: &f64) -> f64 {
     (a - b).abs()
 }
 
+#[allow(unused)]
 fn compare_states(a: &f64, b: &f64) -> Ordering {
     a.total_cmp(b)
 }
 
+#[allow(unused)]
 fn construct_parameters(a: f64) -> (f64, Parameters) {
     (0.5, Parameters { a })
 }
 
+#[allow(unused)]
 fn project_results_period(_: f64, parameters: Parameters, result: Cycle<f64>) -> Option<String> {
     let period = match &result {
         Cycle::FixedPoint(_) => 1,
@@ -52,7 +56,7 @@ fn project_results_limit_object(
     let object = match &result {
         Cycle::FixedPoint(x) => format!("(1) {x}"),
         Cycle::Cycle(cycle) => format!("({}) {:?}", cycle.len(), cycle),
-        Cycle::Divergence => format!("diverged"),
+        Cycle::Divergence => "diverged".to_string(),
     };
 
     Some(format!("{}: {}", parameters.a, object))

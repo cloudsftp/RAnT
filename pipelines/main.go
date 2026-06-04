@@ -34,12 +34,10 @@ func (m *RanT) TestAndLint(
 		return err
 	}
 
-	/*
-		err = r.Lint(ctx, source)
-		if err != nil {
-			return err
-		}
-	*/
+	err = r.Lint(ctx, source)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
