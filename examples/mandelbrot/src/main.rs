@@ -22,15 +22,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let out_file_name = PathBuf::from(OUT_FILE_NAME);
     let out_dir_name = out_file_name
         .parent()
-        .expect(format!("Could not get parent of").as_str());
+        .unwrap_or_else(|| panic!("{}", "Could not get parent of".to_string()));
 
-    fs::create_dir_all(out_dir_name).expect(
-        format!(
-            "Could not create directory {}",
-            out_dir_name.to_string_lossy()
-        )
-        .as_str(),
-    );
+    fs::create_dir_all(out_dir_name).unwrap_or_else(|_| panic!("Could not create directory {}",
+            out_dir_name.to_string_lossy()));
 
     let root = BitMapBackend::new(
         &out_file_name,
@@ -66,7 +61,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             construct_initial_state_and_parameters: construct_parameters,
         };
         let results = scan_parallel(
-            parallel_generator.clone(),
+            parallel_generator,
             parameter_adapter,
             simulate_mandelbrot,
         );
