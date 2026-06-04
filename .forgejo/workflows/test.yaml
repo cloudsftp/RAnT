@@ -1,0 +1,16 @@
+name: Run tests
+
+on: push
+
+enable-email-notifications: true
+
+jobs:
+  test-rust:
+    runs-on: dagger
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Run Tests
+        run: dagger call test-and-lint
